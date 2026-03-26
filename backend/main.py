@@ -67,12 +67,12 @@ def health() -> dict:
 
 @app.post("/feedback/upload", response_model=UploadResponse)
 async def upload_feedback(
-    files: Annotated[Optional[List[UploadFile]], File(default=None)] = None,
-    manual_text: Annotated[Optional[str], Form(default=None)] = None,
-    customer: Annotated[Optional[str], Form(default=None)] = None,
-    source: Annotated[Optional[str], Form(default=None)] = None,
-    feedback_type: Annotated[Optional[str], Form(default=None)] = None,
-    date: Annotated[Optional[str], Form(default=None)] = None,
+    files: Annotated[Optional[List[UploadFile]], File()] = None,
+    manual_text: Annotated[Optional[str], Form()] = None,
+    customer: Annotated[Optional[str], Form()] = None,
+    source: Annotated[Optional[str], Form()] = None,
+    feedback_type: Annotated[Optional[str], Form()] = None,
+    date: Annotated[Optional[str], Form()] = None,
 ) -> UploadResponse:
     if not files and not manual_text:
         raise HTTPException(
