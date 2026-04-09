@@ -12,7 +12,7 @@ export function Header({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-6 rounded-4xl border border-white/60 bg-white/75 p-8 shadow-soft backdrop-blur lg:flex-row lg:items-end lg:justify-between">
+    <div className="flex flex-col gap-6 rounded-4xl border border-slate-200/80 bg-white/85 p-8 shadow-soft backdrop-blur lg:flex-row lg:items-end lg:justify-between">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-tide">
           {eyebrow}

@@ -6,6 +6,7 @@ from analysis import simple_analysis
 from config import OPENAI_ANALYSIS_MODEL, OPENAI_API_KEY
 from models import AnalysisRequest, AnalysisResponse
 from prompts import (
+    QUESTION_ANSWER_PROMPT,
     FEATURE_REQUEST_ANALYSIS_PROMPT,
     OPPORTUNITIES_ANALYSIS_PROMPT,
     PAIN_POINT_ANALYSIS_PROMPT,
@@ -52,6 +53,7 @@ class AnalysisService:
         if not records:
             empty_message = "No matching feedback was found. Upload feedback or adjust the filters."
             return AnalysisResponse(
+                answer=empty_message,
                 pain_points=empty_message,
                 feature_requests=empty_message,
                 themes=empty_message,
@@ -61,6 +63,8 @@ class AnalysisService:
             )
 
         try:
+            answer = self._run_completion(build_prompt(
+                QUESTION_ANSWER_PROMPT, context, request.query))
             pain_points = self._run_completion(build_prompt(
                 PAIN_POINT_ANALYSIS_PROMPT, context, request.query))
             feature_requests = self._run_completion(build_prompt(
@@ -71,12 +75,17 @@ class AnalysisService:
                 OPPORTUNITIES_ANALYSIS_PROMPT, context, request.query))
         except Exception:
             fallback = simple_analysis(match["text"] for match in records)
+            answer = (
+                f"Direct answer to '{request.query}': based on the available feedback, "
+                f"the strongest signals are {fallback['themes'].replace('Recurring themes appear around: ', '').rstrip('.')}."
+            )
             pain_points = fallback["pain_points"]
             feature_requests = fallback["feature_requests"]
             themes = fallback["themes"]
             opportunities = fallback["opportunities"]
 
         return AnalysisResponse(
+            answer=answer,
             pain_points=pain_points,
             feature_requests=feature_requests,
             themes=themes,

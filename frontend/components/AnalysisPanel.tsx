@@ -6,7 +6,7 @@ import { Sparkles } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
 import { InsightCard } from "@/components/InsightCard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { runAnalysis } from "@/lib/api";
+import { getStats, runAnalysis } from "@/lib/api";
 import { loadInsightSnapshots, saveInsightSnapshot } from "@/lib/storage";
 import type { AnalysisResponse, InsightSnapshot } from "@/lib/types";
 
@@ -18,6 +18,7 @@ export function AnalysisPanel() {
   const [customer, setCustomer] = useState("");
   const [source, setSource] = useState("");
   const [topK, setTopK] = useState(6);
+  const [customers, setCustomers] = useState<string[]>([]);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [history, setHistory] = useState<InsightSnapshot[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,24 @@ export function AnalysisPanel() {
 
   useEffect(() => {
     setHistory(loadInsightSnapshots());
+
+    let cancelled = false;
+
+    void getStats()
+      .then((stats) => {
+        if (!cancelled) {
+          setCustomers(stats.customers);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCustomers([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleRun = async () => {
@@ -95,12 +114,18 @@ export function AnalysisPanel() {
               <span className="mb-2 block text-sm font-medium text-ink">
                 Customer filter
               </span>
-              <input
+              <select
                 value={customer}
                 onChange={(event) => setCustomer(event.target.value)}
-                placeholder="Optional"
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-tide focus:ring-4 focus:ring-tide/10"
-              />
+              >
+                <option value="">All customers</option>
+                {customers.map((customerName) => (
+                  <option key={customerName} value={customerName}>
+                    {customerName}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label>
@@ -117,7 +142,7 @@ export function AnalysisPanel() {
           </div>
 
           <label>
-            <span className="mb-2 block text-sm font-medium text-ink">
+            <span className="mb-2 mt-2 block text-sm font-medium text-ink">
               Context depth
             </span>
             <input
@@ -129,7 +154,7 @@ export function AnalysisPanel() {
               className="w-full accent-ember"
             />
             <p className="mt-2 text-sm text-slate-600">
-              Top {topK} retrieved chunks will be used as context.
+              Top {topK} relevant feedback excerpts will be used as context.
             </p>
           </label>
         </div>
@@ -158,7 +183,7 @@ export function AnalysisPanel() {
                   <p className="font-medium text-ink">{item.query}</p>
                   <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
                     {new Date(item.createdAt).toLocaleString()} |{" "}
-                    {item.contextCount} chunks
+                    {item.contextCount} feedback excerpts
                   </p>
                 </div>
               ))}
@@ -178,10 +203,13 @@ export function AnalysisPanel() {
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-tide">
                 Analysis Summary
               </p>
+              <div className="mt-4 rounded-3xl bg-paper/70 p-5 text-sm leading-7 text-slate-700">
+                {result.answer}
+              </div>
               <div className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
                 <div className="rounded-2xl bg-paper/70 p-4">
                   <p className="text-xs uppercase tracking-[0.16em] text-slate-500">
-                    Context used
+                    Evidence used
                   </p>
                   <p className="mt-2 text-2xl font-semibold text-ink">
                     {result.context_count}
@@ -205,18 +233,31 @@ export function AnalysisPanel() {
                 </div>
               </div>
             </div>
-            <InsightCard title="Pain Points" content={result.pain_points} />
+            <InsightCard
+              title="Pain Points"
+              subtitle="Most important customer problems behind the answer"
+              content={result.pain_points}
+            />
             <InsightCard
               title="Feature Requests"
+              subtitle="Requested improvements mentioned across the evidence"
               content={result.feature_requests}
             />
-            <InsightCard title="Themes" content={result.themes} />
-            <InsightCard title="Opportunities" content={result.opportunities} />
+            <InsightCard
+              title="Themes"
+              subtitle="Cross-cutting patterns across the retrieved feedback"
+              content={result.themes}
+            />
+            <InsightCard
+              title="Opportunities"
+              subtitle="Recommended product moves based on the evidence"
+              content={result.opportunities}
+            />
           </>
         ) : (
           <EmptyState
             title="No insight run yet"
-            description="Use the analysis panel to retrieve stored feedback chunks and generate a multi-part product intelligence summary."
+            description="Ask a specific product question to get a direct answer first, followed by concise supporting insights."
           />
         )}
       </section>

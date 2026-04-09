@@ -11,15 +11,39 @@ import {
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { uploadFeedback } from "@/lib/api";
 import { loadUploadHistory, saveUploadHistory } from "@/lib/storage";
-import type { UploadHistoryItem, UploadResponse } from "@/lib/types";
+import type {
+  FeedbackType,
+  FeedbackTypeCounts,
+  UploadHistoryItem,
+  UploadResponse,
+} from "@/lib/types";
 
 const initialValues: FeedbackFormValues = {
   manualText: "",
   customer: "",
   source: "",
-  feedbackType: "general",
+  feedbackType: "auto",
   date: "",
 };
+
+function formatFeedbackTypeLabel(type: string): string {
+  return type.replaceAll("_", " ");
+}
+
+function formatDetectedMix(
+  counts: FeedbackTypeCounts | undefined,
+): string | null {
+  if (!counts) {
+    return null;
+  }
+
+  const parts = Object.entries(counts)
+    .filter((entry): entry is [FeedbackType, number] => Boolean(entry[1]))
+    .sort((left, right) => right[1] - left[1])
+    .map(([type, count]) => `${formatFeedbackTypeLabel(type)}: ${count}`);
+
+  return parts.length > 0 ? parts.join(" | ") : null;
+}
 
 export function UploadFeedback() {
   const [values, setValues] = useState<FeedbackFormValues>(initialValues);
@@ -60,7 +84,7 @@ export function UploadFeedback() {
       if (values.source.trim()) {
         formData.append("source", values.source.trim());
       }
-      if (values.feedbackType) {
+      if (values.feedbackType !== "auto") {
         formData.append("feedback_type", values.feedbackType);
       }
       if (values.date) {
@@ -83,6 +107,8 @@ export function UploadFeedback() {
           manualPreview: values.manualText.slice(0, 120) || undefined,
           ingestedEntries: response.ingested_entries,
           ingestedChunks: response.ingested_chunks,
+          suggestedFeedbackType: response.suggested_feedback_type,
+          feedbackTypeCounts: response.feedback_type_counts,
         }),
       );
       setValues(initialValues);
@@ -172,22 +198,36 @@ export function UploadFeedback() {
           {result ? (
             <div className="mt-4 space-y-3 text-sm text-slate-600">
               <p>
-                <span className="font-semibold text-ink">Entries:</span>{" "}
+                <span className="font-semibold text-ink">Feedback items:</span>{" "}
                 {result.ingested_entries}
               </p>
               <p>
-                <span className="font-semibold text-ink">Chunks:</span>{" "}
+                <span className="font-semibold text-ink">
+                  Search-ready records:
+                </span>{" "}
                 {result.ingested_chunks}
               </p>
               <p>
                 <span className="font-semibold text-ink">Sources:</span>{" "}
                 {result.sources.join(", ") || "None"}
               </p>
+              <p>
+                <span className="font-semibold text-ink">Suggested type:</span>{" "}
+                {result.suggested_feedback_type
+                  ? formatFeedbackTypeLabel(result.suggested_feedback_type)
+                  : "Not enough signal"}
+              </p>
+              {formatDetectedMix(result.feedback_type_counts) ? (
+                <p>
+                  <span className="font-semibold text-ink">Detected mix:</span>{" "}
+                  {formatDetectedMix(result.feedback_type_counts)}
+                </p>
+              ) : null}
             </div>
           ) : (
             <EmptyState
               title="No upload yet"
-              description="Once feedback is ingested, this panel shows how many entries and chunks were stored for retrieval."
+              description="Once feedback is ingested, this panel shows how many feedback items and search-ready records were stored, plus the suggested feedback type."
             />
           )}
         </div>
@@ -209,9 +249,20 @@ export function UploadFeedback() {
                   </div>
                   <p className="mt-2">{item.source || "manual"}</p>
                   <p className="mt-2">
-                    Entries: {item.ingestedEntries} | Chunks:{" "}
-                    {item.ingestedChunks}
+                    Feedback items: {item.ingestedEntries} | Search-ready
+                    records: {item.ingestedChunks}
                   </p>
+                  {item.suggestedFeedbackType ? (
+                    <p className="mt-2">
+                      Suggested type:{" "}
+                      {formatFeedbackTypeLabel(item.suggestedFeedbackType)}
+                    </p>
+                  ) : null}
+                  {formatDetectedMix(item.feedbackTypeCounts) ? (
+                    <p className="mt-2">
+                      Detected mix: {formatDetectedMix(item.feedbackTypeCounts)}
+                    </p>
+                  ) : null}
                   {item.files.length > 0 ? (
                     <p className="mt-2">Files: {item.files.join(", ")}</p>
                   ) : null}

@@ -6,6 +6,10 @@ export type FeedbackType =
   | "question"
   | "general";
 
+export type FeedbackTypeSelection = FeedbackType | "auto";
+
+export type FeedbackTypeCounts = Partial<Record<FeedbackType, number>>;
+
 export interface HealthResponse {
   status: string;
   openai_configured: boolean;
@@ -26,6 +30,8 @@ export interface UploadResponse {
   ingested_entries: number;
   ingested_chunks: number;
   sources: string[];
+  suggested_feedback_type?: FeedbackType;
+  feedback_type_counts: FeedbackTypeCounts;
 }
 
 export interface AnalysisRequest {
@@ -36,6 +42,7 @@ export interface AnalysisRequest {
 }
 
 export interface AnalysisResponse {
+  answer: string;
   pain_points: string;
   feature_requests: string;
   themes: string;
@@ -51,6 +58,39 @@ export interface CustomerReportResponse {
   sources: string[];
 }
 
+export interface OverviewSignal {
+  name: string;
+  count: number;
+  summary: string;
+  evidence: string[];
+}
+
+export interface ChurnRiskCustomer {
+  customer: string;
+  risk: "medium" | "high";
+  score: number;
+  reasons: string[];
+  evidence: string;
+  sources: string[];
+}
+
+export interface TechnicalMetrics {
+  total_chunks: number;
+  total_feedback_entries: number;
+  customers_count: number;
+  sources_count: number;
+  collection_name: string;
+  openai_configured: boolean;
+}
+
+export interface ProductOverviewResponse {
+  summary_headline: string;
+  pain_points: OverviewSignal[];
+  feature_requests: OverviewSignal[];
+  churn_risks: ChurnRiskCustomer[];
+  technical_metrics: TechnicalMetrics;
+}
+
 export interface UploadHistoryItem {
   id: string;
   createdAt: string;
@@ -60,6 +100,8 @@ export interface UploadHistoryItem {
   manualPreview?: string;
   ingestedEntries: number;
   ingestedChunks: number;
+  suggestedFeedbackType?: FeedbackType;
+  feedbackTypeCounts?: FeedbackTypeCounts;
 }
 
 export interface InsightSnapshot {

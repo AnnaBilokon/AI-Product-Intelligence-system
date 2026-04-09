@@ -6,6 +6,7 @@ from typing import List, Optional
 from fastapi import UploadFile
 
 from config import normalize_feedback_type
+from feedback_classifier import suggest_feedback_type
 from feedback_parser import parse_csv_bytes, parse_manual_text, parse_pdf_bytes, parse_txt_bytes
 from models import FeedbackEntry
 
@@ -49,5 +50,10 @@ class FeedbackIngestionService:
             else:
                 raise ValueError(
                     f"Unsupported file type: {suffix or 'unknown'}")
+
+        if not feedback_type:
+            for entry in entries:
+                if entry.type == "general":
+                    entry.type = suggest_feedback_type(entry.text)
 
         return entries

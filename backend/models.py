@@ -37,6 +37,8 @@ class UploadResponse(BaseModel):
     ingested_entries: int
     ingested_chunks: int
     sources: List[str] = Field(default_factory=list)
+    suggested_feedback_type: Optional[str] = None
+    feedback_type_counts: Dict[str, int] = Field(default_factory=dict)
 
 
 class AnalysisRequest(BaseModel):
@@ -48,6 +50,7 @@ class AnalysisRequest(BaseModel):
 
 
 class AnalysisResponse(BaseModel):
+    answer: str
     pain_points: str
     feature_requests: str
     themes: str
@@ -79,3 +82,36 @@ class StatsResponse(BaseModel):
 class ClearResponse(BaseModel):
     message: str
     cleared_chunks: int
+
+
+class OverviewSignal(BaseModel):
+    name: str
+    count: int
+    summary: str
+    evidence: List[str] = Field(default_factory=list)
+
+
+class ChurnRiskCustomer(BaseModel):
+    customer: str
+    risk: str
+    score: int
+    reasons: List[str] = Field(default_factory=list)
+    evidence: str
+    sources: List[str] = Field(default_factory=list)
+
+
+class TechnicalMetrics(BaseModel):
+    total_chunks: int
+    total_feedback_entries: int
+    customers_count: int
+    sources_count: int
+    collection_name: str
+    openai_configured: bool
+
+
+class ProductOverviewResponse(BaseModel):
+    summary_headline: str
+    pain_points: List[OverviewSignal] = Field(default_factory=list)
+    feature_requests: List[OverviewSignal] = Field(default_factory=list)
+    churn_risks: List[ChurnRiskCustomer] = Field(default_factory=list)
+    technical_metrics: TechnicalMetrics

@@ -62,7 +62,9 @@ export function CustomerReport() {
             </div>
             <div className="grid gap-2 text-sm text-slate-600 sm:text-right">
               <p>
-                <span className="font-semibold text-ink">Feedback chunks:</span>{" "}
+                <span className="font-semibold text-ink">
+                  Relevant feedback excerpts:
+                </span>{" "}
                 {report.feedback_count}
               </p>
               <p>

@@ -7,7 +7,7 @@ export default function InsightsPage() {
       <Header
         eyebrow="Insights"
         title="Interrogate the feedback graph"
-        description="Run focused analysis over retrieved chunks to surface pain points, repeated requests, recurring themes, and opportunities worth shipping."
+        description="Run focused analysis over relevant feedback excerpts to surface pain points, repeated requests, recurring themes, and opportunities worth shipping."
       />
       <AnalysisPanel />
     </>

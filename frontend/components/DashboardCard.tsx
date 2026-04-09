@@ -14,7 +14,7 @@ export function DashboardCard({
   icon?: ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-4xl border border-white/60 bg-white/90 p-6 shadow-panel">
+    <div className="relative overflow-hidden rounded-4xl border border-slate-200/80 bg-white/95 p-6 shadow-soft">
       <div
         className="absolute inset-x-0 top-0 h-1"
         style={{ background: accent }}
@@ -30,7 +30,7 @@ export function DashboardCard({
           <p className="mt-3 text-sm leading-6 text-slate-600">{detail}</p>
         </div>
         {icon ? (
-          <div className="rounded-2xl bg-paper px-3 py-2 text-ink">{icon}</div>
+          <div className="rounded-2xl bg-mist px-3 py-2 text-ink">{icon}</div>
         ) : null}
       </div>
     </div>

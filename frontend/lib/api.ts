@@ -1,6 +1,7 @@
 import type {
   AnalysisRequest,
   AnalysisResponse,
+  ProductOverviewResponse,
   CustomerReportResponse,
   HealthResponse,
   StatsResponse,
@@ -45,6 +46,10 @@ export function getHealth(): Promise<HealthResponse> {
 
 export function getStats(): Promise<StatsResponse> {
   return request<StatsResponse>("/stats");
+}
+
+export function getOverview(): Promise<ProductOverviewResponse> {
+  return request<ProductOverviewResponse>("/overview");
 }
 
 export function uploadFeedback(formData: FormData): Promise<UploadResponse> {

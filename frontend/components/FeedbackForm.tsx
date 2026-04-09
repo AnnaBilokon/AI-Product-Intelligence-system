@@ -2,13 +2,13 @@
 
 import { ChangeEvent } from "react";
 
-import type { FeedbackType } from "@/lib/types";
+import type { FeedbackType, FeedbackTypeSelection } from "@/lib/types";
 
 export interface FeedbackFormValues {
   manualText: string;
   customer: string;
   source: string;
-  feedbackType: FeedbackType;
+  feedbackType: FeedbackTypeSelection;
   date: string;
 }
 
@@ -83,12 +83,17 @@ export function FeedbackForm({ values, onChange }: FeedbackFormProps) {
           onChange={handleFieldChange("feedbackType")}
           className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition focus:border-tide focus:ring-4 focus:ring-tide/10"
         >
+          <option value="auto">Auto-detect after upload</option>
           {FEEDBACK_TYPES.map((type) => (
             <option key={type} value={type}>
               {type.replace("_", " ")}
             </option>
           ))}
         </select>
+        <p className="mt-2 text-xs text-slate-500">
+          Leave this on auto-detect to let the system suggest the most likely
+          feedback type after upload.
+        </p>
       </label>
 
       <label>
