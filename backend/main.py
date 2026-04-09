@@ -14,6 +14,8 @@ from models import (
     AnalysisRequest,
     AnalysisResponse,
     ClearResponse,
+    CustomerDetailResponse,
+    CustomerListItem,
     CustomerReportRequest,
     CustomerReportResponse,
     ProductOverviewResponse,
@@ -118,6 +120,22 @@ def run_analysis(request: AnalysisRequest) -> AnalysisResponse:
 def customer_report(request: CustomerReportRequest) -> CustomerReportResponse:
     try:
         return customer_service.generate(request.customer)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.get("/customers", response_model=List[CustomerListItem])
+def customers() -> List[CustomerListItem]:
+    try:
+        return customer_service.list_customers()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.get("/customers/{customer_name}", response_model=CustomerDetailResponse)
+def customer_detail(customer_name: str) -> CustomerDetailResponse:
+    try:
+        return customer_service.get_customer_detail(customer_name)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 

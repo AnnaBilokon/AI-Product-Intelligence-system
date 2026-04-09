@@ -9,7 +9,7 @@ export const navItems = [
   { href: "/", label: "Overview", icon: LayoutDashboard },
   { href: "/feedback", label: "Feedback", icon: FileText },
   { href: "/insights", label: "Insights", icon: BarChart3 },
-  { href: "/customers", label: "Customers", icon: Users },
+  { href: "/customers", label: "Companies", icon: Users },
 ] as const;
 
 export function Sidebar() {

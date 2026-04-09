@@ -2,6 +2,8 @@ import type {
   AnalysisRequest,
   AnalysisResponse,
   ProductOverviewResponse,
+  CustomerDetailResponse,
+  CustomerListItem,
   CustomerReportResponse,
   HealthResponse,
   StatsResponse,
@@ -73,6 +75,18 @@ export function generateCustomerReport(
     method: "POST",
     body: JSON.stringify({ customer }),
   });
+}
+
+export function getCustomers(): Promise<CustomerListItem[]> {
+  return request<CustomerListItem[]>("/customers");
+}
+
+export function getCustomerDetail(
+  customer: string,
+): Promise<CustomerDetailResponse> {
+  return request<CustomerDetailResponse>(
+    `/customers/${encodeURIComponent(customer)}`,
+  );
 }
 
 export function clearCollection(): Promise<{

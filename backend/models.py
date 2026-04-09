@@ -70,6 +70,54 @@ class CustomerReportResponse(BaseModel):
     sources: List[str] = Field(default_factory=list)
 
 
+class CustomerListItem(BaseModel):
+    customer: str
+    feedback_count: int
+    sources: List[str] = Field(default_factory=list)
+    latest_feedback_date: Optional[str] = None
+    churn_level: str = "low"
+    churn_score: int = 0
+    churn_probability: int = 0
+    churn_reasons: List[str] = Field(default_factory=list)
+
+
+class CustomerFeedbackItem(BaseModel):
+    feedback_id: str
+    source: str
+    type: str
+    date: Optional[str] = None
+    summary: str
+    preview: str
+    full_text: str
+    sentiment_score: int = 0
+    sentiment_label: str = "neutral"
+
+
+class SentimentTimelinePoint(BaseModel):
+    period: str
+    label: str
+    average_sentiment: int
+    feedback_count: int
+    positive_count: int = 0
+    neutral_count: int = 0
+    negative_count: int = 0
+
+
+class CustomerDetailResponse(BaseModel):
+    customer: str
+    report: str
+    feedback_count: int
+    sources: List[str] = Field(default_factory=list)
+    churn_level: str = "low"
+    churn_score: int = 0
+    churn_probability: int = 0
+    churn_reasons: List[str] = Field(default_factory=list)
+    average_sentiment: int = 0
+    sentiment_timeline: List[SentimentTimelinePoint] = Field(
+        default_factory=list)
+    feedback_items: List[CustomerFeedbackItem] = Field(default_factory=list)
+
+
 class StatsResponse(BaseModel):
     total_chunks: int
     total_feedback_entries: int

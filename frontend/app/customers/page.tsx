@@ -1,15 +1,15 @@
-import { CustomerReport } from "@/components/CustomerReport";
+import { CompanyExplorer } from "@/components/CompanyExplorer";
 import { Header } from "@/components/Header";
 
 export default function CustomersPage() {
   return (
     <>
       <Header
-        eyebrow="Customers"
-        title="Generate account-specific intelligence"
-        description="Pull all stored feedback for a customer and turn it into a usable summary for product reviews, success planning, or expansion conversations."
+        eyebrow="Companies"
+        title="Explore company intelligence"
+        description="Open any company to review its account summary, product insights, and the full timeline of uploaded feedback that shaped those signals."
       />
-      <CustomerReport />
+      <CompanyExplorer />
     </>
   );
 }

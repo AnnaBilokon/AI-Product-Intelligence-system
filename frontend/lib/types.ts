@@ -58,6 +58,53 @@ export interface CustomerReportResponse {
   sources: string[];
 }
 
+export interface CustomerListItem {
+  customer: string;
+  feedback_count: number;
+  sources: string[];
+  latest_feedback_date?: string | null;
+  churn_level: "low" | "medium" | "high";
+  churn_score: number;
+  churn_probability: number;
+  churn_reasons: string[];
+}
+
+export interface CustomerFeedbackItem {
+  feedback_id: string;
+  source: string;
+  type: string;
+  date?: string | null;
+  summary: string;
+  preview: string;
+  full_text: string;
+  sentiment_score: number;
+  sentiment_label: "positive" | "neutral" | "negative";
+}
+
+export interface SentimentTimelinePoint {
+  period: string;
+  label: string;
+  average_sentiment: number;
+  feedback_count: number;
+  positive_count: number;
+  neutral_count: number;
+  negative_count: number;
+}
+
+export interface CustomerDetailResponse {
+  customer: string;
+  report: string;
+  feedback_count: number;
+  sources: string[];
+  churn_level: "low" | "medium" | "high";
+  churn_score: number;
+  churn_probability: number;
+  churn_reasons: string[];
+  average_sentiment: number;
+  sentiment_timeline: SentimentTimelinePoint[];
+  feedback_items: CustomerFeedbackItem[];
+}
+
 export interface OverviewSignal {
   name: string;
   count: number;

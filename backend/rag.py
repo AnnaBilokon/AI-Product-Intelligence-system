@@ -161,6 +161,17 @@ class FeedbackRAG:
         rows = self.vector_store.get_documents(filters={"customer": customer})
         return sorted(rows, key=lambda item: (item["metadata"].get("date", ""), item["metadata"].get("chunk_index", 0)))
 
+    def get_all_feedback(self) -> List[Dict[str, Any]]:
+        rows = self.vector_store.get_documents()
+        return sorted(
+            rows,
+            key=lambda item: (
+                item["metadata"].get("customer", ""),
+                item["metadata"].get("date", ""),
+                item["metadata"].get("chunk_index", 0),
+            ),
+        )
+
     def get_stats(self) -> Dict[str, Any]:
         return self.vector_store.get_stats()
 
